@@ -8,25 +8,66 @@ set(ColourBold  "${Esc}[1m")
 set(ColourReset "${Esc}[m")
 set(ColourRed   "${Esc}[31m")
 
-message ("${ColourBold}Compiler Detection${ColourReset}")
-
 project (genmap CXX)
 
 # ----------------------------------------------------------------------------
-# Make "Release" the default cmake build type
+# App version
 # ----------------------------------------------------------------------------
 
-if (NOT CMAKE_BUILD_TYPE)
-    set (CMAKE_BUILD_TYPE Release CACHE STRING
-         "Choose the type of build, options are: Debug Release RelWithDebInfo"
-         FORCE)
+# change this after every release
+set (SEQAN_APP_VERSION_MAJOR "0")
+set (SEQAN_APP_VERSION_MINOR "9")
+set (SEQAN_APP_VERSION_PATCH "0")
+# don't change the following
+set (SEQAN_APP_VERSION "${SEQAN_APP_VERSION_MAJOR}.${SEQAN_APP_VERSION_MINOR}.${SEQAN_APP_VERSION_PATCH}")
+# adapt when necessary
+set (MINIMUM_SEQAN_VERSION "2.4.0")
+
+# ----------------------------------------------------------------------------
+# Compiler detection
+# ----------------------------------------------------------------------------
+
+message ("${ColourBold}Compiler Detection${ColourReset}")
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.9.1)
+        message (FATAL_ERROR "Your GCC version is too old. Minimum version is GCC-4.9.1!")
+        return ()
+    endif ()
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.6)
+        message (FATAL_ERROR "Your Clang version is too old. Please upgrade to 3.8.0 or use GCC.")
+        return()
+    elseif (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.8)
+        message (WARNING "Your Clang version is too old, you will not have parallelism! Upgrade to 3.8.0 or newer.")
+    endif ()
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 17)
+        message(WARNING "Your Intel Compiler version is too old. Please upgrade to 17.0.0 or newer!")
+    endif ()
+else ()
+    message(WARNING "Unknown compiler, you are own your own!")
 endif ()
 
+message(STATUS "Compiling with ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}.")
+
+message(STATUS "The requirements where met.")
+
 # ----------------------------------------------------------------------------
-# Begin of dependency detection
+# Dependency detection
 # ----------------------------------------------------------------------------
 
 message ("\n${ColourBold}Dependency detection${ColourReset}")
+
+if (SEQAN_VERSION_STRING VERSION_LESS "${MINIMUM_SEQAN_VERSION}")
+    message (FATAL_ERROR "The minimum SeqAn verison required is ${MINIMUM_SEQAN_VERSION}!")
+    return ()
+endif ()
+
+# deactivate the version check on broken seqan releases
+if (SEQAN_VERSION_STRING VERSION_LESS "2.3.2")
+    add_definitions (-DSEQAN_DISABLE_VERSION_CHECK="YES")
+endif ()
 
 if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include/seqan/include/seqan/version.h")
     set (CMAKE_INCLUDE_PATH
@@ -42,21 +83,49 @@ if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include/seqan/include/seqan/version.h")
     message (    "   This will be preferred over system global headers.")
 endif ()
 
+# Search SeqAn and select dependencies.
+find_package(OpenMP QUIET)
+find_package(SeqAn  QUIET REQUIRED CONFIG)
+
+# Add include directories.
+include_directories (${SEQAN_INCLUDE_DIRS})
+
+# Add definitions set by find_package (SeqAn).
+add_definitions (${SEQAN_DEFINITIONS})
+
+message(STATUS "These dependencies where found:")
+message(   "     OPENMP     ${OPENMP_FOUND}      ${OpenMP_CXX_FLAGS}")
+message(   "     SEQAN      ${SEQAN_FOUND}      ${SEQAN_VERSION_STRING}")
+
+# Warn if OpenMP was not found.
+if (NOT OPENMP_FOUND)
+    message (WARNING "WARNING WARNING WARNING\nWARNING: OpenMP not found. GenMap will be built without multi-threading! "
+    "This is probably not what you want! Use GCC >= 4.9.1, Clang >= 3.8.0 or ICC >= 16.0.2\nWARNING WARNING WARNING")
+endif (NOT OPENMP_FOUND)
+
+message(STATUS "The requirements where met.")
+
 # ----------------------------------------------------------------------------
-# Add GenMap targets
+# Add targets
 # ----------------------------------------------------------------------------
+
 add_subdirectory(src)
 
 # ----------------------------------------------------------------------------
-# Warn if cmake build type is not "Release"
+# Add tests
 # ----------------------------------------------------------------------------
-if (NOT CMAKE_BUILD_TYPE STREQUAL Release)
-    message (STATUS "${ColourRed}CMAKE_BUILD_TYPE is not \"Release\", your binaries will be slow.${ColourReset}")
-endif ()
 
-# ----------------------------------------------------------------------------
-# Add Tests
-# ----------------------------------------------------------------------------
 message ("\n${ColourBold}Setting up unit tests${ColourReset}")
 enable_testing()
-add_subdirectory(tests)
+add_subdirectory(tests EXCLUDE_FROM_ALL)
+
+message(STATUS "Tests added.")
+
+# ----------------------------------------------------------------------------
+# Add benchmarks
+# ----------------------------------------------------------------------------
+
+message ("\n${ColourBold}Setting up benchmarks${ColourReset}")
+add_subdirectory(benchmarks EXCLUDE_FROM_ALL)
+
+message(STATUS "Benchmarks added.\n")

@@ -4,8 +4,6 @@
 
 cmake_minimum_required (VERSION 3.0.0)
 
-include (CTest)
-
 include (ExternalProject)
 
 ExternalProject_Add(googletest
@@ -16,16 +14,10 @@ ExternalProject_Add(googletest
                     GIT_TAG release-1.8.0
                     UPDATE_DISCONNECTED YES)
 
-# TODO: remove this block
-find_package(SeqAn REQUIRED)
-include_directories (${SEQAN_INCLUDE_DIRS})
-set (SEQAN_APP_VERSION "0.0.0")
-add_definitions (-DSEQAN_APP_VERSION="${SEQAN_APP_VERSION}")
-
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
 add_executable(genmap_algo_test tests.cpp)
 add_dependencies(genmap_algo_test googletest)
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
 target_link_libraries(genmap_algo_test ${SEQAN_LIBRARIES})
 target_link_libraries(genmap_algo_test ${CMAKE_CURRENT_BINARY_DIR}/lib/libgtest.a)
 target_link_libraries(genmap_algo_test ${CMAKE_CURRENT_BINARY_DIR}/lib/libgtest_main.a)
@@ -35,7 +27,6 @@ add_test(NAME    algo_test
          COMMAND genmap_algo_test)
 
 # TODO: add dependencies
-
 function(add_test_suite TEST_NAME_PREFIX TEST_CASE_FOLDER INDEX_FLAGS MAP_FLAGS)
     add_test(
         NAME "${TEST_NAME_PREFIX}_raw_map"

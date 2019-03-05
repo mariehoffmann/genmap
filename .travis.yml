@@ -67,4 +67,4 @@ matrix:
 script:
   - mkdir -p build && cd build
   - cmake .. -DGENMAP_NATIVE_BUILD=0 -DGENMAP_COMPILE_THREADS=2 ${CMAKE_ARGS}
-  - travis_wait make -j2 VERBOSE=1 && ctest . -j2 --output-on-failure
+  - travis_wait make genmap genmap_algo_test genmap_algo_benchmark -j2 VERBOSE=1 && ctest . -j2 --output-on-failure
