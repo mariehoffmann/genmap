@@ -7,46 +7,46 @@ matrix:
     # GCC on Linux
     ##########################################################################
 
-    - os: linux
-      compiler: gcc-4.9
-      addons:
-        apt:
-          sources: ['ubuntu-toolchain-r-test']
-          packages: ['cmake', 'g++-4.9']
-      install: export CXX="g++-4.9"
-      # env: CMAKE_ARGS=""
-
-    - os: linux
-      compiler: gcc-5
-      addons:
-        apt:
-          sources: ['ubuntu-toolchain-r-test']
-          packages: ['cmake', 'g++-5']
-      install: export CXX="g++-5"
-
-    - os: linux
-      compiler: gcc-6
-      addons:
-        apt:
-          sources: ['ubuntu-toolchain-r-test']
-          packages: ['cmake', 'g++-6']
-      install: export CXX="g++-6"
-
-    - os: linux
-      compiler: gcc-7
-      addons:
-        apt:
-          sources: ['ubuntu-toolchain-r-test']
-          packages: ['cmake', 'g++-7']
-      install: export CXX="g++-7"
-
-    - os: linux
-      compiler: gcc-8
-      addons:
-        apt:
-          sources: ['ubuntu-toolchain-r-test']
-          packages: ['cmake', 'g++-8']
-      install: export CXX="g++-8"
+    # - os: linux
+    #   compiler: gcc-4.9
+    #   addons:
+    #     apt:
+    #       sources: ['ubuntu-toolchain-r-test']
+    #       packages: ['cmake', 'g++-4.9']
+    #   install: export CXX="g++-4.9"
+    #   # env: CMAKE_ARGS=""
+    #
+    # - os: linux
+    #   compiler: gcc-5
+    #   addons:
+    #     apt:
+    #       sources: ['ubuntu-toolchain-r-test']
+    #       packages: ['cmake', 'g++-5']
+    #   install: export CXX="g++-5"
+    #
+    # - os: linux
+    #   compiler: gcc-6
+    #   addons:
+    #     apt:
+    #       sources: ['ubuntu-toolchain-r-test']
+    #       packages: ['cmake', 'g++-6']
+    #   install: export CXX="g++-6"
+    #
+    # - os: linux
+    #   compiler: gcc-7
+    #   addons:
+    #     apt:
+    #       sources: ['ubuntu-toolchain-r-test']
+    #       packages: ['cmake', 'g++-7']
+    #   install: export CXX="g++-7"
+    #
+    # - os: linux
+    #   compiler: gcc-8
+    #   addons:
+    #     apt:
+    #       sources: ['ubuntu-toolchain-r-test']
+    #       packages: ['cmake', 'g++-8']
+    #   install: export CXX="g++-8"
 
     ##########################################################################
     # Clang on Linux
@@ -70,41 +70,41 @@ matrix:
           packages: ['cmake', 'clang-3.9', 'g++-7'] # g++ required for newer libstdc++
       install: export CXX="clang++-3.9"
 
-    - os: linux
-      dist: trusty
-      compiler: clang-4.0
-      addons:
-        apt:
-          sources: ['llvm-toolchain-trusty-4.0', 'ubuntu-toolchain-r-test']
-          packages: ['cmake', 'clang-4.0', 'g++-7'] # g++ required for newer libstdc++
-      install: export CXX="clang++-4.0"
-
-    - os: linux
-      dist: trusty
-      compiler: clang-5.0
-      addons:
-        apt:
-          sources: ['llvm-toolchain-trusty-5.0', 'ubuntu-toolchain-r-test']
-          packages: ['cmake', 'clang-5.0', 'g++-7'] # g++ required for newer libstdc++
-      install: export CXX="clang++-5.0"
-
-    - os: linux
-      dist: trusty
-      compiler: clang-6.0
-      addons:
-        apt:
-          sources: ['llvm-toolchain-trusty-6.0', 'ubuntu-toolchain-r-test']
-          packages: ['cmake', 'clang-6.0', 'g++-7'] # g++ required for newer libstdc++
-      install: export CXX="clang++-6.0"
-
-    - os: linux
-      dist: trusty
-      compiler: clang-7.0
-      addons:
-        apt:
-          sources: ['llvm-toolchain-trusty-7', 'ubuntu-toolchain-r-test']
-          packages: ['cmake', 'clang-7', 'g++-7'] # g++ required for newer libstdc++
-      install: export CXX="clang++-7"
+    # - os: linux
+    #   dist: trusty
+    #   compiler: clang-4.0
+    #   addons:
+    #     apt:
+    #       sources: ['llvm-toolchain-trusty-4.0', 'ubuntu-toolchain-r-test']
+    #       packages: ['cmake', 'clang-4.0', 'g++-7'] # g++ required for newer libstdc++
+    #   install: export CXX="clang++-4.0"
+    #
+    # - os: linux
+    #   dist: trusty
+    #   compiler: clang-5.0
+    #   addons:
+    #     apt:
+    #       sources: ['llvm-toolchain-trusty-5.0', 'ubuntu-toolchain-r-test']
+    #       packages: ['cmake', 'clang-5.0', 'g++-7'] # g++ required for newer libstdc++
+    #   install: export CXX="clang++-5.0"
+    #
+    # - os: linux
+    #   dist: trusty
+    #   compiler: clang-6.0
+    #   addons:
+    #     apt:
+    #       sources: ['llvm-toolchain-trusty-6.0', 'ubuntu-toolchain-r-test']
+    #       packages: ['cmake', 'clang-6.0', 'g++-7'] # g++ required for newer libstdc++
+    #   install: export CXX="clang++-6.0"
+    #
+    # - os: linux
+    #   dist: trusty
+    #   compiler: clang-7.0
+    #   addons:
+    #     apt:
+    #       sources: ['llvm-toolchain-trusty-7', 'ubuntu-toolchain-r-test']
+    #       packages: ['cmake', 'clang-7', 'g++-7'] # g++ required for newer libstdc++
+    #   install: export CXX="clang++-7"
 
     ##########################################################################
     # Clang on OSX (with Xcode)
@@ -131,7 +131,7 @@ matrix:
       compiler: clang
 
     ##########################################################################
-    # GCC on OSX
+    # TODO: GCC on OSX
     ##########################################################################
 
     - os: osx
@@ -139,8 +139,43 @@ matrix:
       compiler: gcc-4.9
       before_install:
         - brew update
-        - brew install gcc@4.9
+        # - brew install gcc@4.9
       install: export CXX="g++-4.9"
+
+    - os: osx
+      osx_image: xcode8
+      compiler: gcc-5
+      before_install:
+        - brew update
+        - brew install gcc@5
+      install: export CXX="g++-5"
+
+    - os: osx
+      osx_image: xcode8
+      compiler: gcc-6
+      before_install:
+        - brew update
+        - brew install gcc@6
+      install: export CXX="g++-6"
+
+    - os: osx
+      osx_image: xcode8
+      compiler: gcc-7
+      before_install:
+        - brew update
+        - brew install gcc@7
+      install: export CXX="g++-7"
+
+    - os: osx
+      osx_image: xcode8
+      compiler: gcc-8
+      before_install:
+        - brew update
+        - brew install gcc@8
+      install: export CXX="g++-8"
+
+    # TODO: debug builds (linux), sanitizer (linux), coverage (linux)
+    # native_build (4x OS+CXX)
 
     # - os: osx
     #   compiler: gcc-4.9

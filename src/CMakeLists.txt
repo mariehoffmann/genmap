@@ -72,7 +72,7 @@ endif ()
 
 # TODO: verify whether this works for Clang!
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wl -s")
+    set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wl,-s")
 endif ()
 
 # ----------------------------------------------------------------------------
