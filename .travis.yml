@@ -7,36 +7,55 @@ matrix:
       addons:
         apt:
           sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-4.9', 'cmake', 'cmake-data', 'zlib1g-dev', 'libbz2-dev', 'libboost-dev', 'python', 'python-nose', 'python-jinja2', 'python-pip']
+          packages: ['g++-4.9', 'cmake']
       install: export CXX="g++-4.9"
       env:
-        CMAKE_ARGS="-DGENMAP_STATIC_BUILD=1" # static and sanitizer is not allowed
+        CMAKE_ARGS=""
 
     - os: linux
       compiler: gcc-5
       addons:
         apt:
           sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-5', 'cmake', 'cmake-data', 'zlib1g-dev', 'libbz2-dev', 'libboost-dev', 'python', 'python-nose', 'python-jinja2', 'python-pip']
+          packages: ['g++-5', 'cmake', 'cmake-data']
       install: export CXX="g++-5"
-      env: CMAKE_ARGS="" # TODO -fsanitize=address
+      env: CMAKE_ARGS=""
+
+    - os: linux
+      compiler: gcc-6
+      addons:
+        apt:
+          sources: ['ubuntu-toolchain-r-test']
+          packages: ['g++-6', 'cmake', 'cmake-data']
+      install: export CXX="g++-6"
+      env: CMAKE_ARGS=""
 
     - os: linux
       compiler: gcc-7
       addons:
         apt:
           sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-7', 'cmake', 'cmake-data', 'zlib1g-dev', 'libbz2-dev', 'libboost-dev', 'python', 'python-nose', 'python-jinja2', 'python-pip']
+          packages: ['g++-7', 'cmake', 'cmake-data']
       install: export CXX="g++-7"
       env:
-        CMAKE_ARGS="-DCMAKE_CXX_FLAGS=-std=c++17" # TODO -fsanitize=address
+        CMAKE_ARGS=""
+
+    - os: linux
+      compiler: gcc-8
+      addons:
+        apt:
+          sources: ['ubuntu-toolchain-r-test']
+          packages: ['g++-8', 'cmake', 'cmake-data']
+      install: export CXX="g++-8"
+      env:
+        CMAKE_ARGS=""
 
     - os: linux
       compiler: clang-3.9
       addons:
         apt:
           sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-trusty-3.9']
-          packages: ['clang-3.9', 'g++-7', 'cmake', 'cmake-data', 'zlib1g-dev', 'libbz2-dev', 'libboost-dev', 'python', 'python-nose', 'python-jinja2', 'python-pip'] # g++ required for newer libstdc++
+          packages: ['clang-3.9', 'g++-7', 'cmake', 'cmake-data'] # g++ required for newer libstdc++
       install: export CXX="clang++-3.9"
 
     - os: linux
@@ -44,7 +63,7 @@ matrix:
       addons:
         apt:
           sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-7', 'cmake', 'cmake-data', 'zlib1g-dev', 'libbz2-dev', 'libboost-dev', 'python', 'python-nose', 'python-jinja2', 'python-pip'] # g++ required for newer libstdc++
+          packages: ['g++-7', 'cmake', 'cmake-data'] # g++ required for newer libstdc++
       install: export CXX="/usr/local/clang-5.0.0/bin/clang++"
       env: CMAKE_ARGS="-DCMAKE_BUILD_TYPE=RelWithDebInfo" LD_LIBRARY_PATH="/usr/local/clang-5.0.0/lib/:${LD_LIBRARY_PATH}"
 
