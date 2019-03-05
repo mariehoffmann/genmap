@@ -18,6 +18,7 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
 add_executable(genmap_algo_test tests.cpp)
 add_dependencies(genmap_algo_test googletest)
 
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
 target_link_libraries(genmap_algo_test ${SEQAN_LIBRARIES})
 target_link_libraries(genmap_algo_test ${CMAKE_CURRENT_BINARY_DIR}/lib/libgtest.a)
 target_link_libraries(genmap_algo_test ${CMAKE_CURRENT_BINARY_DIR}/lib/libgtest_main.a)
