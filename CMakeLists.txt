@@ -51,7 +51,7 @@ endif ()
 
 message(STATUS "Compiling with ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}.")
 
-message(STATUS "The requirements where met.")
+message(STATUS "The requirements were met.")
 
 # ----------------------------------------------------------------------------
 # Dependency detection
@@ -103,7 +103,7 @@ if (SEQAN_VERSION_STRING VERSION_LESS "2.3.2")
     add_definitions (-DSEQAN_DISABLE_VERSION_CHECK="YES")
 endif ()
 
-message(STATUS "The requirements where met.")
+message(STATUS "The requirements were met.")
 
 # ----------------------------------------------------------------------------
 # Add targets
