@@ -51,7 +51,7 @@ void saveTxt(std::vector<T> const & c, std::string const & output_path, TChromos
                 outfile << f << ' ';
             }
             float const f = (*(seqEnd - 1) != 0) ? 1.0f / static_cast<float>(*(seqEnd - 1)) : 0;
-            outfile << f << ' '; // no space after last value
+            outfile << f; // no space after last value
         }
         else
         {

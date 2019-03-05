@@ -70,6 +70,9 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     if (GENMAP_COMPILE_THREADS GREATER 1)
         set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -flto=${GENMAP_COMPILE_THREADS}")
     endif()
+
+    # required, otherwise #pragma clang diagnostics will trigger warnings
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unknown-pragmas")
 else ()
     # TODO: parallelize for Clang (isn't this done by default by the default clang linker?)
     set(dummy_ignore "${GENMAP_COMPILE_THREADS}") # surpress warnings
@@ -156,3 +159,5 @@ message ("\n${ColourBold}Setting up benchmarks${ColourReset}")
 add_subdirectory(benchmarks EXCLUDE_FROM_ALL)
 
 message(STATUS "Benchmarks added.\n")
+
+message ("\n${ColourBold}Finishing up${ColourReset}")
