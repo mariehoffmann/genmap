@@ -2,95 +2,152 @@ sudo: false
 language: cpp
 matrix:
   include:
-    - os: linux
-      compiler: gcc-4.9
-      addons:
-        apt:
-          sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-4.9', 'cmake']
-      install: export CXX="g++-4.9"
-      env:
-        CMAKE_ARGS=""
+
+    ##########################################################################
+    # GCC on Linux
+    ##########################################################################
+
+    # - os: linux
+    #   compiler: gcc-4.9
+    #   addons:
+    #     apt:
+    #       sources: ['ubuntu-toolchain-r-test']
+    #       packages: ['cmake', 'g++-4.9']
+    #   install: export CXX="g++-4.9"
+    #   # env: CMAKE_ARGS=""
+    #
+    # - os: linux
+    #   compiler: gcc-5
+    #   addons:
+    #     apt:
+    #       sources: ['ubuntu-toolchain-r-test']
+    #       packages: ['cmake', 'g++-5']
+    #   install: export CXX="g++-5"
+    #
+    # - os: linux
+    #   compiler: gcc-6
+    #   addons:
+    #     apt:
+    #       sources: ['ubuntu-toolchain-r-test']
+    #       packages: ['cmake', 'g++-6']
+    #   install: export CXX="g++-6"
+    #
+    # - os: linux
+    #   compiler: gcc-7
+    #   addons:
+    #     apt:
+    #       sources: ['ubuntu-toolchain-r-test']
+    #       packages: ['cmake', 'g++-7']
+    #   install: export CXX="g++-7"
+    #
+    # - os: linux
+    #   compiler: gcc-8
+    #   addons:
+    #     apt:
+    #       sources: ['ubuntu-toolchain-r-test']
+    #       packages: ['cmake', 'g++-8']
+    #   install: export CXX="g++-8"
+
+    ##########################################################################
+    # Clang on Linux
+    ##########################################################################
 
     - os: linux
-      compiler: gcc-5
+      dist: trusty
+      compiler: clang-3.8
       addons:
         apt:
-          sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-5', 'cmake', 'cmake-data']
-      install: export CXX="g++-5"
-      env: CMAKE_ARGS=""
+          sources: ['llvm-toolchain-precise-3.8', 'ubuntu-toolchain-r-test']
+          packages: ['cmake', 'clang-3.8', 'g++-7'] # g++ required for newer libstdc++
+      install: export CXX="clang++-3.8"
 
     - os: linux
-      compiler: gcc-6
-      addons:
-        apt:
-          sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-6', 'cmake']
-      install: export CXX="g++-6"
-      env: CMAKE_ARGS=""
-
-    - os: linux
-      compiler: gcc-7
-      addons:
-        apt:
-          sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-7', 'cmake']
-      install: export CXX="g++-7"
-      env:
-        CMAKE_ARGS=""
-
-    - os: linux
-      compiler: gcc-8
-      addons:
-        apt:
-          sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-8', 'cmake']
-      install: export CXX="g++-8"
-      env:
-        CMAKE_ARGS=""
-
-    - os: linux
+      dist: trusty
       compiler: clang-3.9
       addons:
         apt:
-          sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-trusty-3.9']
-          packages: ['clang-3.9', 'g++-7', 'cmake'] # g++ required for newer libstdc++
+          sources: ['llvm-toolchain-trusty-3.9', 'ubuntu-toolchain-r-test']
+          packages: ['cmake', 'clang-3.9', 'g++-7'] # g++ required for newer libstdc++
       install: export CXX="clang++-3.9"
 
     - os: linux
-      compiler: clang-5
+      dist: trusty
+      compiler: clang-4.0
       addons:
         apt:
-          sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-7', 'cmake'] # g++ required for newer libstdc++
-      install: export CXX="/usr/local/clang-5.0.0/bin/clang++"
-      env: CMAKE_ARGS="-DCMAKE_BUILD_TYPE=RelWithDebInfo" LD_LIBRARY_PATH="/usr/local/clang-5.0.0/lib/:${LD_LIBRARY_PATH}"
+          sources: ['llvm-toolchain-trusty-4.0', 'ubuntu-toolchain-r-test']
+          packages: ['cmake', 'clang-4.0', 'g++-7'] # g++ required for newer libstdc++
+      install: export CXX="clang++-4.0"
+
+    - os: linux
+      dist: trusty
+      compiler: clang-5.0
+      addons:
+        apt:
+          sources: ['llvm-toolchain-trusty-5.0', 'ubuntu-toolchain-r-test']
+          packages: ['cmake', 'clang-5.0', 'g++-7'] # g++ required for newer libstdc++
+      install: export CXX="clang++-5.0"
+
+    - os: linux
+      dist: trusty
+      compiler: clang-6.0
+      addons:
+        apt:
+          sources: ['llvm-toolchain-trusty-6.0', 'ubuntu-toolchain-r-test']
+          packages: ['cmake', 'clang-6.0', 'g++-7'] # g++ required for newer libstdc++
+      install: export CXX="clang++-6.0"
+
+    - os: linux
+      dist: trusty
+      compiler: clang-7.0
+      addons:
+        apt:
+          sources: ['llvm-toolchain-trusty-7', 'ubuntu-toolchain-r-test']
+          packages: ['cmake', 'clang-7', 'g++-7'] # g++ required for newer libstdc++
+      install: export CXX="clang++-7"
+
+
+    ##########################################################################
+    # Clang on OSX
+    ##########################################################################
 
     - os: osx
-      compiler: gcc-4.9
-      before_install:
-        - brew update
-        - brew install gcc@4.9
-      install: export CXX="g++-4.9"
-      env: CMAKE_ARGS="-DGENMAP_STATIC_BUILD=1"
-
-    - os: osx
-      compiler: gcc-7
-      before_install:
-        - brew update
-        - brew install gcc@7
-      install: export CXX="g++-7"
-      env: CMAKE_ARGS=""
-
-    - os: osx
+      osx_image: xcode10.1
       compiler: clang
-      before_install:
-        - brew update
-        - brew brew tap homebrew/versions
-        - brew install llvm37
-      install: export CXX="clang++-3.7"
-      env: CMAKE_ARGS=""
+
+    # - os: osx
+    #   compiler: gcc-4.9
+    #   before_install:
+    #     - brew update
+    #     - brew install gcc@4.9
+    #   install: export CXX="g++-4.9"
+    #   env: CMAKE_ARGS="-DGENMAP_STATIC_BUILD=1"
+    #
+    # - os: osx
+    #   compiler: gcc-7
+    #   before_install:
+    #     - brew update
+    #     - brew install gcc@7
+    #   install: export CXX="g++-7"
+    #   env: CMAKE_ARGS=""
+    #
+    # - os: osx
+    #   compiler: clang
+    #   before_install:
+    #     - brew update
+    #     - brew tap homebrew/versions
+    #     - brew install llvm37
+    #   install: export CXX="clang++-3.7"
+    #   env: CMAKE_ARGS=""
+
+    # - os: linux
+    #   compiler: clang-5
+    #   addons:
+    #     apt:
+    #       sources: ['ubuntu-toolchain-r-test']
+    #       packages: ['g++-7', 'cmake'] # g++ required for newer libstdc++
+    #   install: export CXX="/usr/local/clang-5.0.0/bin/clang++"
+    #   env: CMAKE_ARGS="-DCMAKE_BUILD_TYPE=RelWithDebInfo" LD_LIBRARY_PATH="/usr/local/clang-5.0.0/lib/:${LD_LIBRARY_PATH}"
 
 script:
   - mkdir -p build && cd build

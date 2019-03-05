@@ -65,32 +65,14 @@ message(   "     GENMAP_STATIC_BUILD             ${GENMAP_STATIC_BUILD}")
 message(STATUS "Run 'cmake -LH' to get a comment on each option.")
 message(STATUS "Remove CMakeCache.txt and re-run cmake with -DOPTIONNAME=ON|OFF to change an option.")
 
-
-# ----------------------------------------------------------------------------
-# Compiler specifics
-# ----------------------------------------------------------------------------
-
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set (SEQAN_CXX_FLAGS "${SEQAN_CXX_FLAGS} -ftemplate-depth-1024")
-endif ()
-
+# strip binaries to make them smaller
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    # parallelize parts of build even for one translation unit
-    if (NOT DEFINED GENMAP_COMPILE_THREADS)
-        include(ProcessorCount)
-        ProcessorCount(GENMAP_COMPILE_THREADS)
-    endif ()
-    if (GENMAP_COMPILE_THREADS GREATER 1)
-        set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -flto=${GENMAP_COMPILE_THREADS}")
-    endif()
-
-    # strip binaries to make them smaller
     set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s")
 endif ()
 
-if (NOT CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-    # -Wextra not met by current SeqAn on intel
-    set (SEQAN_CXX_FLAGS "${SEQAN_CXX_FLAGS} -Wextra")
+# TODO: verify whether this works for Clang!
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wl -s")
 endif ()
 
 # ----------------------------------------------------------------------------

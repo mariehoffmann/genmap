@@ -54,6 +54,33 @@ message(STATUS "Compiling with ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VER
 message(STATUS "The requirements were met.")
 
 # ----------------------------------------------------------------------------
+# Compiler specifics
+# ----------------------------------------------------------------------------
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set (SEQAN_CXX_FLAGS "${SEQAN_CXX_FLAGS} -ftemplate-depth-1024")
+endif ()
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    # parallelize parts of build even for one translation unit
+    if (NOT DEFINED GENMAP_COMPILE_THREADS)
+        include(ProcessorCount)
+        ProcessorCount(GENMAP_COMPILE_THREADS)
+    endif ()
+    if (GENMAP_COMPILE_THREADS GREATER 1)
+        set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -flto=${GENMAP_COMPILE_THREADS}")
+    endif()
+else ()
+    # TODO: parallelize for Clang (isn't this done by default by the default clang linker?)
+    set(dummy_ignore "${GENMAP_COMPILE_THREADS}") # surpress warnings
+endif ()
+
+if (NOT CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+    # -Wextra not met by current SeqAn on intel
+    set (SEQAN_CXX_FLAGS "${SEQAN_CXX_FLAGS} -Wextra")
+endif ()
+
+# ----------------------------------------------------------------------------
 # Dependency detection
 # ----------------------------------------------------------------------------
 
