@@ -39,17 +39,17 @@ endif (GENMAP_NATIVE_BUILD)
 
 if (GENMAP_STATIC_BUILD)
     add_definitions (-DGENMAP_STATIC_BUILD=1)
-    set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+    set (CMAKE_FIND_LIBRARY_SUFFIXES ".a")
     # apple does not support fully static builds, but at least libgcc and libstdc++
     if (APPLE)
-        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc -static-libstdc++")
+        set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc -static-libstdc++")
         message (WARNING "WARNING: Builds on Mac are never fully static.")
     else (APPLE)
-        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
+        set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
     endif (APPLE)
     # on linux cmake adds -rdynamic automatically which clang can't handle in static builds
     if (CMAKE_SYSTEM_NAME MATCHES "Linux")
-        SET(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
+        set (CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
     endif (CMAKE_SYSTEM_NAME MATCHES "Linux")
 endif (GENMAP_STATIC_BUILD)
 
@@ -57,13 +57,11 @@ endif (GENMAP_STATIC_BUILD)
 #     add_definitions (-DLAMBDA_MMAPPED_DB=1)
 # endif (LAMBDA_MMAPPED_DB)
 
-message(STATUS "The following options are selected for the build:")
-# message(   "     LAMBDA_MMAPPED_DB               ${LAMBDA_MMAPPED_DB}")
-message(   "     GENMAP_NATIVE_BUILD             ${GENMAP_NATIVE_BUILD}")
-# message(   "     LAMBDA_MULTIOPT_BUILD           ${LAMBDA_MULTIOPT_BUILD}")
-message(   "     GENMAP_STATIC_BUILD             ${GENMAP_STATIC_BUILD}")
-message(STATUS "Run 'cmake -LH' to get a comment on each option.")
-message(STATUS "Remove CMakeCache.txt and re-run cmake with -DOPTIONNAME=ON|OFF to change an option.")
+message (STATUS "The following options are selected for the build:")
+message (   "     GENMAP_NATIVE_BUILD             ${GENMAP_NATIVE_BUILD}")
+message (   "     GENMAP_STATIC_BUILD             ${GENMAP_STATIC_BUILD}")
+message (STATUS "Run 'cmake -LH' to get a comment on each option.")
+message (STATUS "Remove CMakeCache.txt and re-run cmake with -DOPTIONNAME=ON|OFF to change an option.")
 
 # strip binaries to make them smaller
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
@@ -93,13 +91,12 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SEQAN_CXX_FLAGS} -Wall -pedantic") # TODO: --coverage nur für debug auf travis!
 
 # Update the list of file names below if you add source files to your application.
-set (GENMAP_SOURCE_FILES
-                genmap.cpp
-                common.hpp
-                indexing.hpp
-                mappability.hpp
-                algo.hpp
-                output.hpp)
+set (GENMAP_SOURCE_FILES genmap.cpp
+                         common.hpp
+                         indexing.hpp
+                         mappability.hpp
+                         algo.hpp
+                         output.hpp)
 
 add_executable (genmap ${GENMAP_SOURCE_FILES})
 target_link_libraries (genmap ${SEQAN_LIBRARIES})
