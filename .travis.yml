@@ -106,14 +106,41 @@ matrix:
           packages: ['cmake', 'clang-7', 'g++-7'] # g++ required for newer libstdc++
       install: export CXX="clang++-7"
 
+    ##########################################################################
+    # Clang on OSX (with Xcode)
+    ##########################################################################
 
-    ##########################################################################
-    # Clang on OSX
-    ##########################################################################
+    - os: osx
+      osx_image: xcode6.4
+      compiler: clang
+
+    - os: osx
+      osx_image: xcode7.3
+      compiler: clang
+
+    - os: osx
+      osx_image: xcode8.3
+      compiler: clang
+
+    - os: osx
+      osx_image: xcode9.4
+      compiler: clang
 
     - os: osx
       osx_image: xcode10.1
       compiler: clang
+
+    ##########################################################################
+    # GCC on OSX
+    ##########################################################################
+
+    - os: osx
+      osx_image: xcode8
+      compiler: gcc-4.9
+      before_install:
+        - brew update
+        - brew install gcc@4.9
+      install: export CXX="g++-4.9"
 
     # - os: osx
     #   compiler: gcc-4.9

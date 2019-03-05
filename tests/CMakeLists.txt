@@ -14,7 +14,7 @@ ExternalProject_Add(googletest
                     GIT_TAG release-1.8.0
                     UPDATE_DISCONNECTED YES)
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}") # TODO: --coverage
 add_executable(genmap_algo_test tests.cpp)
 add_dependencies(genmap_algo_test googletest)
 
