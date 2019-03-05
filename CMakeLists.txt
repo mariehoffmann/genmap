@@ -59,16 +59,6 @@ message(STATUS "The requirements where met.")
 
 message ("\n${ColourBold}Dependency detection${ColourReset}")
 
-if (SEQAN_VERSION_STRING VERSION_LESS "${MINIMUM_SEQAN_VERSION}")
-    message (FATAL_ERROR "The minimum SeqAn verison required is ${MINIMUM_SEQAN_VERSION}!")
-    return ()
-endif ()
-
-# deactivate the version check on broken seqan releases
-if (SEQAN_VERSION_STRING VERSION_LESS "2.3.2")
-    add_definitions (-DSEQAN_DISABLE_VERSION_CHECK="YES")
-endif ()
-
 if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include/seqan/include/seqan/version.h")
     set (CMAKE_INCLUDE_PATH
         ${CMAKE_CURRENT_SOURCE_DIR}/include/seqan/include
@@ -102,6 +92,16 @@ if (NOT OPENMP_FOUND)
     message (WARNING "WARNING WARNING WARNING\nWARNING: OpenMP not found. GenMap will be built without multi-threading! "
     "This is probably not what you want! Use GCC >= 4.9.1, Clang >= 3.8.0 or ICC >= 16.0.2\nWARNING WARNING WARNING")
 endif (NOT OPENMP_FOUND)
+
+if (SEQAN_VERSION_STRING VERSION_LESS "${MINIMUM_SEQAN_VERSION}")
+    message (FATAL_ERROR "The minimum SeqAn verison required is ${MINIMUM_SEQAN_VERSION}!")
+    return ()
+endif ()
+
+# deactivate the version check on broken seqan releases
+if (SEQAN_VERSION_STRING VERSION_LESS "2.3.2")
+    add_definitions (-DSEQAN_DISABLE_VERSION_CHECK="YES")
+endif ()
 
 message(STATUS "The requirements where met.")
 
