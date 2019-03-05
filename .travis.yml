@@ -26,7 +26,7 @@ matrix:
       addons:
         apt:
           sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-6', 'cmake', 'cmake-data']
+          packages: ['g++-6', 'cmake']
       install: export CXX="g++-6"
       env: CMAKE_ARGS=""
 
@@ -35,7 +35,7 @@ matrix:
       addons:
         apt:
           sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-7', 'cmake', 'cmake-data']
+          packages: ['g++-7', 'cmake']
       install: export CXX="g++-7"
       env:
         CMAKE_ARGS=""
@@ -45,7 +45,7 @@ matrix:
       addons:
         apt:
           sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-8', 'cmake', 'cmake-data']
+          packages: ['g++-8', 'cmake']
       install: export CXX="g++-8"
       env:
         CMAKE_ARGS=""
@@ -55,7 +55,7 @@ matrix:
       addons:
         apt:
           sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-trusty-3.9']
-          packages: ['clang-3.9', 'g++-7', 'cmake', 'cmake-data'] # g++ required for newer libstdc++
+          packages: ['clang-3.9', 'g++-7', 'cmake'] # g++ required for newer libstdc++
       install: export CXX="clang++-3.9"
 
     - os: linux
@@ -63,7 +63,7 @@ matrix:
       addons:
         apt:
           sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-7', 'cmake', 'cmake-data'] # g++ required for newer libstdc++
+          packages: ['g++-7', 'cmake'] # g++ required for newer libstdc++
       install: export CXX="/usr/local/clang-5.0.0/bin/clang++"
       env: CMAKE_ARGS="-DCMAKE_BUILD_TYPE=RelWithDebInfo" LD_LIBRARY_PATH="/usr/local/clang-5.0.0/lib/:${LD_LIBRARY_PATH}"
 
@@ -95,4 +95,4 @@ matrix:
 script:
   - mkdir -p build && cd build
   - cmake .. -DGENMAP_NATIVE_BUILD=0 -DGENMAP_COMPILE_THREADS=2 ${CMAKE_ARGS}
-  - travis_wait make genmap genmap_algo_test genmap_algo_benchmark -j2 VERBOSE=1 && ctest . -j2 --output-on-failure
+  - travis_wait 30 make genmap genmap_algo_test genmap_algo_benchmark -j2 VERBOSE=1 && ctest . -j2 --output-on-failure
