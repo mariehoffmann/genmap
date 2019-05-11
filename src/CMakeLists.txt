@@ -25,7 +25,7 @@ endif ()
 message (STATUS "GenMap version is: ${SEQAN_APP_VERSION}")
 
 # option (LAMBDA_MMAPPED_DB     "Use mmapped access to the database."                                                    OFF)
-option (GENMAP_NATIVE_BUILD   "Architecture-specific optimizations, i.e. g++ -march=native."                           ON)
+option (GENMAP_NATIVE_BUILD   "Architecture-specific optimizations, i.e. g++ -march=native."                           OFF)
 # option (LAMBDA_MULTIOPT_BUILD "Build and install multiple binaries with different optimisation levels + a dispatcher." OFF)
 option (GENMAP_STATIC_BUILD   "Include all libraries in the binaries."                                                 OFF)
 
@@ -100,6 +100,7 @@ set (GENMAP_SOURCE_FILES genmap.cpp
 
 add_executable (genmap ${GENMAP_SOURCE_FILES})
 target_link_libraries (genmap ${SEQAN_LIBRARIES})
+message("seqan libraries: ${SEQAN_LIBRARIES}")
 
 # if (LAMBDA_MULTIOPT_BUILD)
 #     add_executable (lambda2-sse4 ${LAMBDA_SOURCE_FILES})
