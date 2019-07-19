@@ -45,6 +45,10 @@ struct GemMapFastFMIndexConfig
     static unsigned SAMPLING;
 };
 
+// expose member SAMPLING to linker
+template <typename TSpec, typename TLengthSum, unsigned LEVELS, unsigned WORDS_PER_BLOCK>
+unsigned GemMapFastFMIndexConfig<TSpec, TLengthSum, LEVELS, WORDS_PER_BLOCK>::SAMPLING = 10;
+
 template <typename TLengthSum>
 using TGemMapFastFMIndexConfig = GemMapFastFMIndexConfig<void, TLengthSum, 2, 1>;
 
