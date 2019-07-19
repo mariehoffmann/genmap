@@ -10,7 +10,7 @@ using namespace seqan;
 void sharedSetup(ArgumentParser & parser)
 {
     // Set short description, version, and date.
-    std::string versionString = SEQAN_APP_VERSION;
+    std::string versionString = "1.0.0";  // TODO: include header containing SEQAN_APP_VERSION;
     setVersion(parser, versionString);
     setDate(parser, __DATE__);
     setShortCopyright(parser, "2019 Christopher Pockrandt, released under the 3-clause-BSD; "
@@ -67,6 +67,9 @@ void sharedSetup(ArgumentParser & parser)
         "<https://github.com/cpockrandt/genmap/wiki>");
 }
 
+namespace genmap::detail
+{
+// TODO: enclose in a different namespace
 template <typename TText, typename TSpec, typename TConfig>
 inline bool open(Index<TText, BidirectionalIndex<FMIndex<TSpec, TConfig> > > & index, const char * fileName, int openMode)
 {
@@ -89,7 +92,7 @@ inline bool open(Index<TText, BidirectionalIndex<FMIndex<TSpec, TConfig> > > & i
     if (!open(getFibre(index.rev, FibreLF()), toCString(name), openMode)) return false;
 
     name = fileName;    append(name, ".sa.len");
-    if (!open(index.rev.sa.sparseString._length, toCString(name), openMode)) return false;
+    if (!seqan::open(index.rev.sa.sparseString._length, toCString(name), openMode)) return false;
 
     setFibre(getFibre(index.rev, FibreSA()), getFibre(index.rev, FibreLF()), FibreLF());
 
@@ -107,3 +110,5 @@ inline bool saveRev(Index<TText, FMIndex<TSpec, TConfig> > const & index, const 
 
     return true;
 }
+
+}  // namespace genmap::detail
