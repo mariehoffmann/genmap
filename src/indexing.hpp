@@ -1,3 +1,5 @@
+#pragma once
+
 #include <type_traits>
 #include <sys/types.h>
 #include <dirent.h>
@@ -6,11 +8,11 @@
 #include <seqan/seq_io.h>
 #include <seqan/index.h>
 
+#include "common.hpp"
+
 #include "../include/lambda/src/mkindex_saca.hpp"
 #include "../include/lambda/src/mkindex_misc.hpp"
 #include "../include/lambda/src/mkindex_algo.hpp"
-
-#include "common.hpp"
 
 using namespace seqan;
 
@@ -110,7 +112,7 @@ void buildIndex(TChromosomes & chromosomes, IndexOptions const & options)
         }
         clear(getFibre(getFibre(getFibre(bwdIndex, FibreSA()), FibreSparseString()), FibreValues()));
         clear(getFibre(getFibre(getFibre(bwdIndex, FibreSA()), FibreSparseString()), FibreIndicators()));
-        saveRev(bwdIndex, toCString(std::string(toCString(options.indexPath)) + ".rev"));
+        genmap::detail::saveRev(bwdIndex, toCString(std::string(toCString(options.indexPath)) + ".rev"));
     }
 }
 
@@ -367,7 +369,7 @@ int indexMain(int const argc, char const ** argv)
             std::string const len = std::to_string(length(chromosomes2[i]));
             std::string const file = extractFileName(toCString(fastaPath));
             // NOTE: maybe parsing of sequence names in fasta files is necessary
-            appendValue(directoryInformation, file + ";" + len + ";" + id);
+            appendValue(directoryInformation, file + ";" + len + ";" + id);  // Note: no newline!
             appendValue(chromosomes, chromosomes2[i]);
         }
 
