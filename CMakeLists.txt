@@ -73,6 +73,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 
     # required, otherwise #pragma clang diagnostics will trigger warnings
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unknown-pragmas")
+    set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wno-unknown-pragmas")
 else ()
     # TODO: parallelize for Clang (isn't this done by default by the default clang linker?)
     set (dummy_ignore "${GENMAP_COMPILE_THREADS}") # surpress warnings
