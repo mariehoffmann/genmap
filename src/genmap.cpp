@@ -2,12 +2,10 @@
 
 #include <seqan/arg_parse.h>
 
+#include "common.hpp"
 #include "genmap_helper.hpp"
 #include "indexing.hpp"
 #include "mappability.hpp"
-
-template <typename TSpec, typename TLengthSum, unsigned LEVELS, unsigned WORDS_PER_BLOCK>
-unsigned GemMapFastFMIndexConfig<TSpec, TLengthSum, LEVELS, WORDS_PER_BLOCK>::SAMPLING = 10;
 
 using namespace seqan;
 
@@ -56,7 +54,13 @@ int main(int const argc, char const ** argv)
 
     if (std::string(argv[until]) == "map")
     {
-        return mappabilityMain(argc - until, argv + until);
+        using TSeqNo = uint64_t;
+        using TSeqPos = uint64_t;
+        using TLocations = std::map<seqan::Pair<TSeqNo, TSeqPos>,
+                 std::pair<std::vector<seqan::Pair<TSeqNo, TSeqPos> >,
+                           std::vector<seqan::Pair<TSeqNo, TSeqPos> > > >;
+        TLocations locations;
+        return mappabilityMain<TLocations>(argc - until, argv + until, locations);
     }
     else if (std::string(argv[until]) == "index")
     {
