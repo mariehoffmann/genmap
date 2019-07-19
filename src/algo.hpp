@@ -1,3 +1,5 @@
+#pragma once
+
 #include "find2_index_approx.hpp"
 
 using namespace seqan;
@@ -260,13 +262,13 @@ inline void computeMappability(TIndex & index, TText const & text, TContainer & 
     {
         uint64_t _cumLength = 0;
         appendValue(chromCumLengths, 0);
+
         for (uint64_t i = 0; i < length(chromLengths); ++i)
         {
             _cumLength += chromLengths[i];
             appendValue(chromCumLengths, _cumLength);
         }
     }
-
     auto const & limits = stringSetLimits(indexText(index));
     uint64_t const textLength = length(text);
     uint64_t const numberOfKmers = textLength - params.length + 1;
@@ -285,6 +287,7 @@ inline void computeMappability(TIndex & index, TText const & text, TContainer & 
     initProgress<outputProgress>(progressCount, progressStep, progressMax, stepSize, numberOfKmers);
 
     #pragma omp parallel for schedule(dynamic, chunkSize) num_threads(params.threads)
+
     for (uint64_t i = 0; i < numberOfKmers; i += stepSize)
     {
         // overlap is the length of the infix!
@@ -298,19 +301,15 @@ inline void computeMappability(TIndex & index, TText const & text, TContainer & 
         uint64_t endPos = maxPos; // endPos is excluding, i.e. [beginPos, endPos)
         while (i > 0 && endPos - 1 >= i && c[endPos - 1] != 0) // we do not check for i == 0 to avoid an underflow.
             --endPos;
-
         if (i != endPos)
         {
             uint64_t overlap = params.length - (endPos - beginPos) + 1;
-
             auto scheme = OptimalSearchSchemesGM<errors>::VALUE;
             _optimalSearchSchemeComputeFixedBlocklengthGM(scheme, overlap);
-
             std::vector<typename TBiIter::TFwdIndexIter> itExact(endPos - beginPos);
             std::vector<TValue> hits(endPos - beginPos, 0);
             std::vector<std::vector<typename TBiIter::TFwdIndexIter> > itAll(endPos - beginPos);
             std::vector<std::vector<typename TBiIter::TFwdIndexIter> > itAllrevCompl(endPos - beginPos);
-
             auto const & needles = infix(text, beginPos, beginPos + params.length + (endPos - beginPos) - 1);
             auto const & needlesOverlap = infix(text, beginPos + params.length - overlap, beginPos + params.length);
             using TNeedlesOverlap = decltype(needlesOverlap);
@@ -360,12 +359,12 @@ inline void computeMappability(TIndex & index, TText const & text, TContainer & 
                 // hits of the reverse-complement are stored in reversed order.
                 std::reverse(hits.begin(), hits.end());
             }
-
             TBiIter it(index);
+
             _optimalSearchSchemeGM(delegate, it, needlesOverlap, scheme, HammingDistance());
             for (uint64_t j = beginPos; j < endPos; ++j)
             {
-                SEQAN_IF_CONSTEXPR (csvComputation)
+                SEQAN_IF_CONSTEXPR (csvComputation) // Attention: why this here? no location filling when csvCompution = 0
                 {
                     using TLocation = typename TLocations::key_type;
                     using TEntry = std::pair<TLocation, std::pair<std::vector<TLocation>, std::vector<TLocation> > >;
@@ -375,6 +374,7 @@ inline void computeMappability(TIndex & index, TText const & text, TContainer & 
                     uint64_t size = 0;
                     for (auto const & iterator : itAll[j - beginPos])
                         size += countOccurrences(iterator);
+                    // if (size < CUTOFF) continue;
                     entry.second.first.reserve(size);
 
                     size = 0;
@@ -465,7 +465,6 @@ inline void computeMappability(TIndex & index, TText const & text, TContainer & 
 
         printProgress<outputProgress>(progressCount, progressStep, progressMax);
     }
-
     // The algorithm searches k-mers in the concatenation of all strings in the fasta file (e.g. chromosomes).
     // Hence, it also searches k-mers that overlap two strings that actually do not exist.
     // At the end we overwrite the frequency of those k-mers with 0.
