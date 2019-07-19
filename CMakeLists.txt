@@ -107,7 +107,7 @@ find_package (SeqAn  QUIET REQUIRED CONFIG)
 
 # Add include directories.
 include_directories (${SEQAN_INCLUDE_DIRS})
-
+message("seqan include_dirs: ${SEQAN_INCLUDE_DIRS}")
 # Add definitions set by find_package (SeqAn).
 add_definitions (${SEQAN_DEFINITIONS})
 

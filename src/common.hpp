@@ -7,6 +7,49 @@
 
 using namespace seqan;
 
+enum OutputType
+{
+    mappability,     // float (32 bit)
+    frequency_large, // uint16_t (16 bit)
+    frequency_small  // uint8_t (8 bit)
+};
+
+struct Options
+{
+    bool mmap;
+    bool indels;
+    bool wigFile; // group files into mergable flags, i.e., BED | WIG, etc.
+    bool bedFile;
+    bool rawFile;
+    bool txtFile;
+    bool csvFile;
+    OutputType outputType;
+    bool directory;
+    bool verbose;
+    CharString indexPath;
+    CharString outputPath;
+    CharString alphabet;
+    uint32_t seqNoWidth;
+    uint32_t maxSeqLengthWidth;
+    uint32_t totalLengthWidth;
+    unsigned errors;
+    unsigned sampling;
+};
+
+template <typename TSpec>
+inline std::string retrieve(StringSet<CharString, TSpec> const & info, std::string const & key)
+{
+    for (uint32_t i = 0; i < length(info); ++i)
+    {
+        std::string row = toCString(static_cast<CharString>(info[i]));
+        if (row.substr(0, length(key)) == key)
+            return row.substr(length(key) + 1);
+    }
+    // This should never happen unless the index file is corrupted or manipulated.
+    std::cout << "ERROR: Malformed index.info file! Could not find key '" << key << "'.\n";
+    exit(1);
+}
+
 inline auto retrieveDirectoryInformationLine(CharString const & info)
 {
     std::string const row = toCString(info);
@@ -45,8 +88,9 @@ struct GemMapFastFMIndexConfig
     static unsigned SAMPLING;
 };
 
-// expose member SAMPLING to linker
 template <typename TSpec, typename TLengthSum, unsigned LEVELS, unsigned WORDS_PER_BLOCK>
+
+// expose member SAMPLING to linker
 unsigned GemMapFastFMIndexConfig<TSpec, TLengthSum, LEVELS, WORDS_PER_BLOCK>::SAMPLING = 10;
 
 template <typename TLengthSum>

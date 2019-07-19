@@ -12,54 +12,11 @@
 #include <seqan/seq_io.h>
 #include <seqan/index.h>
 
-static constexpr bool outputProgress = true; // TODO: remove global variable
-
-enum OutputType
-{
-    mappability,     // float (32 bit)
-    frequency_large, // uint16_t (16 bit)
-    frequency_small  // uint8_t (8 bit)
-};
-
-struct Options
-{
-    bool mmap;
-    bool indels;
-    bool wigFile; // group files into mergable flags, i.e., BED | WIG, etc.
-    bool bedFile;
-    bool rawFile;
-    bool txtFile;
-    bool csvFile;
-    OutputType outputType;
-    bool directory;
-    bool verbose;
-    CharString indexPath;
-    CharString outputPath;
-    CharString alphabet;
-    uint32_t seqNoWidth;
-    uint32_t maxSeqLengthWidth;
-    uint32_t totalLengthWidth;
-    unsigned errors;
-    unsigned sampling;
-};
+//static constexpr bool outputProgress = true; // TODO: remove global variable
 
 #include "common.hpp"
 #include "algo.hpp"
 #include "output.hpp"
-
-template <typename TSpec>
-inline std::string retrieve(StringSet<CharString, TSpec> const & info, std::string const & key)
-{
-    for (uint32_t i = 0; i < length(info); ++i)
-    {
-        std::string row = toCString(static_cast<CharString>(info[i]));
-        if (row.substr(0, length(key)) == key)
-            return row.substr(length(key) + 1);
-    }
-    // This should never happen unless the index file is corrupted or manipulated.
-    std::cout << "ERROR: Malformed index.info file! Could not find key '" << key << "'.\n";
-    exit(1);
-}
 
 template <typename TVector, typename TChromosomeNames, typename TChromosomeLengths, typename TLocations, typename TDirectoryInformation>
 inline void outputMappability(TVector const & c, Options const & opt, SearchParams const & searchParams,
@@ -465,7 +422,9 @@ int mappabilityMain(int argc, char const ** argv, TLocations & locations)
     }
 
     // TODO: remove brackets, opt.alphabet and replace by local bool.
-    run1<TLocations, (opt.alphabet == "dna4") ? Dna : Dna5>(locations, opt, searchParams);
-
+    if (opt.alphabet == "dna4")
+        run1<TLocations,  Dna>(locations, opt, searchParams);
+    else
+        run1<TLocations,  Dna5>(locations, opt, searchParams);
     return 0;
 }
