@@ -1,10 +1,14 @@
-#include <vector>
-#include <cstdint>
-#include <limits>
+#pragma once
+
 #include <cmath>
+#include <cstdint>
+#include <filesystem>
+#include <limits>
 #include <sys/stat.h>
+#include <vector>
 
 #include <seqan/arg_parse.h>
+#include <seqan/basic.h>
 #include <seqan/seq_io.h>
 #include <seqan/index.h>
 
@@ -42,8 +46,6 @@ struct Options
 #include "common.hpp"
 #include "algo.hpp"
 #include "output.hpp"
-
-using namespace seqan;
 
 template <typename TSpec>
 inline std::string retrieve(StringSet<CharString, TSpec> const & info, std::string const & key)
@@ -133,30 +135,22 @@ inline void outputMappability(TVector const & c, Options const & opt, SearchPara
         std::cout << " done!\n";
 }
 
-template <typename TDistance, typename value_type, bool csvComputation, typename TSeqNo, typename TSeqPos,
-          typename TIndex, typename TText, typename TChromosomeNames, typename TChromosomeLengths, typename TDirectoryInformation>
-inline void run(TIndex & index, TText const & text, Options const & opt, SearchParams const & searchParams,
-                std::string const & fastaFile, TChromosomeNames const & chromNames, TChromosomeLengths const & chromLengths,
-                TDirectoryInformation const & directoryInformation, std::vector<TSeqNo> const & mappingSeqIdFile)
+template <typename TLocations, typename TDistance, typename value_type, bool csvComputation, typename TSeqNo, typename TSeqPos, typename TIndex, typename TText, typename TChromosomeNames, typename TChromosomeLengths, typename TDirectoryInformation>
+inline void run7(TLocations & locations, TIndex & index, TText const & fastaInfix, Options const & opt, SearchParams const & searchParams, std::string const & fastaFile, TChromosomeNames const & chromNames, TChromosomeLengths const & chromLengths, TDirectoryInformation const & directoryInformation, std::vector<TSeqNo> const & mappingSeqIdFile)
 {
-    std::vector<value_type> c(length(text), 0);
-
-    std::map<Pair<TSeqNo, TSeqPos>,
-             std::pair<std::vector<Pair<TSeqNo, TSeqPos> >,
-                       std::vector<Pair<TSeqNo, TSeqPos> > > > locations;
-
+    std::vector<value_type> c(length(fastaInfix), 0);
     double start = get_wall_time();
     switch (opt.errors)
     {
-        case 0:  computeMappability<0, csvComputation>(index, text, c, searchParams, opt.directory, chromLengths, locations, mappingSeqIdFile);
+        case 0:  computeMappability<0, csvComputation>(index, fastaInfix, c, searchParams, opt.directory, chromLengths, locations, mappingSeqIdFile);
                  break;
-        case 1:  computeMappability<1, csvComputation>(index, text, c, searchParams, opt.directory, chromLengths, locations, mappingSeqIdFile);
+        case 1:  computeMappability<1, csvComputation>(index, fastaInfix, c, searchParams, opt.directory, chromLengths, locations, mappingSeqIdFile);
                  break;
-        case 2:  computeMappability<2, csvComputation>(index, text, c, searchParams, opt.directory, chromLengths, locations, mappingSeqIdFile);
+        case 2:  computeMappability<2, csvComputation>(index, fastaInfix, c, searchParams, opt.directory, chromLengths, locations, mappingSeqIdFile);
                  break;
-        case 3:  computeMappability<3, csvComputation>(index, text, c, searchParams, opt.directory, chromLengths, locations, mappingSeqIdFile);
+        case 3:  computeMappability<3, csvComputation>(index, fastaInfix, c, searchParams, opt.directory, chromLengths, locations, mappingSeqIdFile);
                  break;
-        case 4:  computeMappability<4, csvComputation>(index, text, c, searchParams, opt.directory, chromLengths, locations, mappingSeqIdFile);
+        case 4:  computeMappability<4, csvComputation>(index, fastaInfix, c, searchParams, opt.directory, chromLengths, locations, mappingSeqIdFile);
                  break;
         default: std::cerr << "E > 4 not yet supported.\n";
                  exit(1);
@@ -173,9 +167,9 @@ inline void run(TIndex & index, TText const & text, Options const & opt, SearchP
     outputMappability(c, opt, searchParams, fastaFile, chromNames, chromLengths, locations, directoryInformation);
 }
 
-template <typename TChar, typename TAllocConfig, typename TDistance, typename value_type, bool csvComputation,
+template <typename TLocations, typename TChar, typename TAllocConfig, typename TDistance, typename value_type, bool csvComputation,
           typename TSeqNo, typename TSeqPos, typename TBWTLen>
-inline void run(Options const & opt, SearchParams const & searchParams)
+inline void run6(TLocations & locations, Options const & opt, SearchParams const & searchParams)
 {
     typedef String<TChar, TAllocConfig> TString;
     typedef StringSet<TString, Owner<ConcatDirect<SizeSpec_<TSeqNo, TSeqPos> > > > TStringSet;
@@ -185,10 +179,13 @@ inline void run(Options const & opt, SearchParams const & searchParams)
 
     using TIndex = Index<TStringSet, TBiIndexConfig<TFMIndexConfig> >;
     TIndex index;
-    open(index, toCString(opt.indexPath), OPEN_RDONLY);
+    if (!genmap::detail::open(index, toCString(opt.indexPath), OPEN_RDONLY))
+        std::cout << "Error: could not load index from " << opt.indexPath << std::endl;
 
     StringSet<CharString, Owner<ConcatDirect<> > > directoryInformation;
-    open(directoryInformation, toCString(std::string(toCString(opt.indexPath)) + ".ids"), OPEN_RDONLY);
+    if (!open(directoryInformation, toCString(std::string(toCString(opt.indexPath)) + ".ids"), OPEN_RDONLY))
+        std::cout << "Error: could not load <index>.ids from " << opt.indexPath << ".ids" << std::endl;
+
     appendValue(directoryInformation, "dummy.entry;0;chromosomename"); // dummy entry enforces that the mappability is
                                                                        // computed for the last file in the while loop.
 
@@ -221,7 +218,7 @@ inline void run(Options const & opt, SearchParams const & searchParams)
         if (std::get<0>(row) != fastaFile)
         {
             auto const & fastaInfix = infixWithLength(text.concat, startPos, fastaFileLength);
-            run<TDistance, value_type, csvComputation, TSeqNo, TSeqPos>(index, fastaInfix, opt, searchParams, fastaFile, chromosomeNames, chromosomeLengths, directoryInformation, mappingSeqIdFile);
+            run7<TLocations, TDistance, value_type, csvComputation, TSeqNo, TSeqPos>(locations, index, fastaInfix, opt, searchParams, fastaFile, chromosomeNames, chromosomeLengths, directoryInformation, mappingSeqIdFile);
 
             startPos += fastaFileLength;
             fastaFile = std::get<0>(row);
@@ -235,42 +232,43 @@ inline void run(Options const & opt, SearchParams const & searchParams)
     }
 }
 
-template <typename TChar, typename TAllocConfig, typename TDistance, typename TValue, bool csvComputation>
-inline void run(Options const & opt, SearchParams const & searchParams)
+template <typename TLocations, typename TChar, typename TAllocConfig, typename TDistance, typename TValue, bool csvComputation>
+inline void run5(TLocations & locations, Options const & opt, SearchParams const & searchParams)
 {
     if (opt.seqNoWidth == 16 && opt.maxSeqLengthWidth == 32)
     {
         if (opt.totalLengthWidth == 32)
-            run<TChar, TAllocConfig, TDistance, TValue, csvComputation, uint16_t, uint32_t, uint32_t>(opt, searchParams);
+            run6<TLocations, TChar, TAllocConfig, TDistance, TValue, csvComputation, uint16_t, uint32_t, uint32_t>(locations, opt, searchParams);
         else if (opt.totalLengthWidth == 64)
-            run<TChar, TAllocConfig, TDistance, TValue, csvComputation, uint16_t, uint32_t, uint64_t>(opt, searchParams);
+            run6<TLocations, TChar, TAllocConfig, TDistance, TValue, csvComputation, uint16_t, uint32_t, uint64_t>(locations, opt, searchParams);
     }
     else if (opt.seqNoWidth == 32 && opt.maxSeqLengthWidth == 16 && opt.totalLengthWidth == 64)
-        run<TChar, TAllocConfig, TDistance, TValue, csvComputation, uint32_t, uint16_t, uint64_t>(opt, searchParams);
+        run6<TLocations, TChar, TAllocConfig, TDistance, TValue, csvComputation, uint32_t, uint16_t, uint64_t>(locations, opt, searchParams);
     else if (opt.seqNoWidth == 64 && opt.maxSeqLengthWidth == 64 && opt.totalLengthWidth == 64)
-        run<TChar, TAllocConfig, TDistance, TValue, csvComputation, uint64_t, uint64_t, uint64_t>(opt, searchParams);
+        run6<TLocations, TChar, TAllocConfig, TDistance, TValue, csvComputation, uint64_t, uint64_t, uint64_t>(locations, opt, searchParams);
 }
 
-template <typename TChar, typename TAllocConfig, typename TDistance, typename TValue>
-inline void run(Options const & opt, SearchParams const & searchParams)
+template <typename TLocations, typename TChar, typename TAllocConfig, typename TDistance, typename TValue>
+inline void run4(TLocations & locations, Options const & opt, SearchParams const & searchParams)
 {
+    //std::cout << "excludePseudo = " << searchParams.excludePseudo << std::endl;
     if (opt.csvFile || searchParams.excludePseudo) // compute csv output when --exclude-pseudo, but don't output!
-        run<TChar, TAllocConfig, TDistance, TValue, true>(opt, searchParams);
+        run5<TLocations, TChar, TAllocConfig, TDistance, TValue, true>(locations, opt, searchParams);
     else
-        run<TChar, TAllocConfig, TDistance, TValue, false>(opt, searchParams);
+        run5<TLocations, TChar, TAllocConfig, TDistance, TValue, false>(locations, opt, searchParams);
 }
 
-template <typename TChar, typename TAllocConfig, typename TDistance>
-inline void run(Options const & opt, SearchParams const & searchParams)
+template <typename TLocations, typename TChar, typename TAllocConfig, typename TDistance>
+inline void run3(TLocations & locations, Options const & opt, SearchParams const & searchParams)
 {
     if (opt.outputType == OutputType::frequency_large || opt.outputType == OutputType::mappability) // TODO: document precision for mappability
-        run<TChar, TAllocConfig, TDistance, uint16_t>(opt, searchParams);
+        run4<TLocations, TChar, TAllocConfig, TDistance, uint16_t>(locations, opt, searchParams);
     else // if (opt.outputType == OutputType::frequency_small)
-        run<TChar, TAllocConfig, TDistance, uint8_t>(opt, searchParams);
+        run4<TLocations, TChar, TAllocConfig, TDistance, uint8_t>(locations, opt, searchParams);
 }
 
-template <typename TChar, typename TAllocConfig>
-inline void run(Options const & opt, SearchParams const & searchParams)
+template <typename TLocations, typename TChar, typename TAllocConfig>
+inline void run2(TLocations & locations, Options const & opt, SearchParams const & searchParams)
 {
     if (opt.indels)
     {
@@ -279,19 +277,20 @@ inline void run(Options const & opt, SearchParams const & searchParams)
         // run<TChar, TAllocConfig, EditDistance>(opt, searchParams);
     }
     else
-        run<TChar, TAllocConfig, HammingDistance>(opt, searchParams);
+        run3<TLocations, TChar, TAllocConfig, HammingDistance>(locations, opt, searchParams);
 }
 
-template <typename TChar>
-inline void run(Options const & opt, SearchParams const & searchParams)
+template <typename TLocations, typename TChar>
+inline void run1(TLocations & locations, Options const & opt, SearchParams const & searchParams)
 {
     if (opt.mmap)
-        run<TChar, MMap<> >(opt, searchParams);
+        run2<TLocations, TChar, MMap<>>(locations, opt, searchParams);
     else
-        run<TChar, Alloc<> >(opt, searchParams);
+        run2<TLocations, TChar, Alloc<>>(locations, opt, searchParams);
 }
 
-int mappabilityMain(int argc, char const ** argv)
+template<typename TLocations>
+int mappabilityMain(int argc, char const ** argv, TLocations & locations)
 {
     // Argument parser
     ArgumentParser parser("GenMap map");
@@ -362,9 +361,9 @@ int mappabilityMain(int argc, char const ** argv)
         struct stat st;
         if (!(stat(toCString(opt.outputPath), &st) == 0 && S_ISDIR(st.st_mode)))
         {
-            std::cerr << "ERROR: The output directory " << opt.outputPath << " does not exist\n"
-                      << "       Please create it, or choose a different location.\n";
-            return ArgumentParser::PARSE_ERROR;
+            std::cerr << "WARNING: The output directory " << opt.outputPath << " does not exist and will be created.\n";
+            std::filesystem::create_directory(toCString(opt.outputPath));
+            //return ArgumentParser::PARSE_ERROR;
         }
 
         if (back(opt.outputPath) != '/')
@@ -466,14 +465,7 @@ int mappabilityMain(int argc, char const ** argv)
     }
 
     // TODO: remove brackets, opt.alphabet and replace by local bool.
-    if (opt.alphabet == "dna4")
-    {
-        run<Dna>(opt, searchParams);
-    }
-    else
-    {
-        run<Dna5>(opt, searchParams);
-    }
+    run1<TLocations, (opt.alphabet == "dna4") ? Dna : Dna5>(locations, opt, searchParams);
 
     return 0;
 }
