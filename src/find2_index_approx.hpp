@@ -321,10 +321,10 @@ inline void _optimalSearchSchemeExactGM(TDelegate & delegate,
     {
         uint32_t infixPosLeft = needleRightPos - 1;
         uint32_t infixPosRight = needleLeftPos + s.blocklength[blockIndex] - 1;
-
         // TODO: search first for N and then perform goDown (same for extend and approx in algo.hpp)
         while (infixPosLeft <= infixPosRight)
         {
+            // if still segfault here: check settings for binary call with std::out
             if ((isDna5 && needle[infixPosLeft] == Dna5('N')) || !goDown(iter, needle[infixPosLeft], TDir()))
                 return;
             ++infixPosLeft;
@@ -410,6 +410,7 @@ inline void _optimalSearchSchemeGM(TDelegate & delegate,
 
             if (needleRightPos - needleLeftPos == s.blocklength[blockIndex])
             {
+
                 // leave the possibility for one or multiple deletions! therefore, don't change direction, etc!
                 _optimalSearchSchemeDeletionGM(delegate, iter, needle, needleLeftPos2, needleRightPos2, errors + 1, s,
                                                blockIndex, TDir());
